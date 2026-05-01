@@ -151,3 +151,5 @@ MESSAGE_TAGS = {
         messages.WARNING: 'alert-warning',
         messages.ERROR: 'alert-danger',
  }
+ALLOWED_HOSTS = ["*"]
+DEBUG = True
