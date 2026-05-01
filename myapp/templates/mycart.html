@@ -1,0 +1,265 @@
+{% extends 'basic.html' %}
+{% load static %}
+
+{% block title %}Cart {% endblock %}
+{% block body %}
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <span>Cart</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+{%if cartitems%}
+
+<section class="shop-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="shop__cart__table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                    <th>Date Time</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for ci in cartitems %}
+                                <tr>
+                                    <td class="cart__product__item">
+                                        <img src="/media/{{ci.Product_id.Pro_image}}" height="50px" alt="">
+                                        <div class="cart__product__item__title">
+                                            <h6>{{ci.Product_name}}</h6>
+                                        </div>
+                                    </td>
+                                    <td class="cart__price">₹ {{ci.Price}}</td>
+                                    <td class="cart__quantity pl-4">
+
+                                            {{ci.Quantity}}
+
+                                    </td>
+                                    <td class="cart__total">₹ {{ci.Final_price}}</td>
+                                    <td class="cart__quantity pr-4">
+
+                                            {{ci.Date_time}}
+
+                                    </td>
+                                    <td class="cart__close pr-4"><a href="/removefromcart/{{ci.id}}"><span class="icon_close"></span></a></td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-lg-4 offset-lg-8">
+                    <div class="cart__total__procced">
+                        <h6>Cart total</h6>
+                        <ul>
+                            <li>Subtotal <span>₹ {{total_price2}}</span></li>
+                            <li>Total <span>₹ {{total_price2}}</span></li>
+                            <li>Deposite : ₹ <span id="deposite"> {{total_deposite}} </span></li>
+                        </ul>
+<!--                        <a href="/checkout" class="primary-btn">Proceed to checkout</a>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <section class="vendor-detail">
+            <div class="container py-5">
+                <div class="row justify-content-left">
+                    <div class="col-lg-6 col-md-8 col-sm-10">
+                        <div class="vendor-detail-content border shadow-sm p-4 rounded bg-white">
+                            <h3 class="text-center mb-4 text-primary">Payment</h3>
+                                  <form method="POST">
+                                    {% csrf_token %}
+                                      <div class="mb-3">
+                                            <label for="start_date" class="form-label">Start Date</label>
+                                            <input type="date" id="start_date" name="start_date" class="form-control" required oninput="validateDates()">
+                                            <small id="pick_date_error" style="color: red; display: none;">Start date must be in the future.</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="end_date" class="form-label">End Date</label>
+                                            <input type="date" id="end_date" name="end_date" class="form-control" required oninput="validateDates()">
+                                            <small id="return_date_error" style="color: red; display: none;">End date must be after Start date.</small>
+                                        </div>
+
+                                       <div class="mb-3">
+                                        <label for="total_price" class="form-label">Total Price</label>
+                                        <input type="text" id="total_price" name="total_price" class="form-control" value="{{ total_price2 }}" readonly>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="payment_mode" class="form-label">Select Payment Mode</label>
+                                        <select id="payment_mode" name="payment_mode" class="form-select" required>
+                                            <option value="" disabled selected>Select</option>
+                                            <option value="online">Online Payment</option>
+                                            <option value="offline">Offline Payment</option>
+                                        </select>
+                                   </div>
+                                    <!-- Fields specific to offline payment -->
+                                    <div id="offline-fields" style="display: none;">
+                                        <div class="mb-3">
+                                            <label for="address" class="form-label">Address</label>
+                                            <textarea id="address" name="address" class="form-control" rows="3" placeholder="Enter your address"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="reference" class="form-label">Reference</label>
+                                            <input type="text" id="reference" name="reference" class="form-control" placeholder="Enter reference details">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="remark" class="form-label">Remarks (Optional)</label>
+                                            <textarea id="remark" name="remark" class="form-control" rows="2" placeholder="Any additional remarks"></textarea>
+                                        </div>
+                                    </div>
+                                <button type="submit" class="search-button" style="background-color: #007bff; color: white; border: none; padding: 10px 15px; cursor: pointer;">Proceed to Payment</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% else %}
+            <br><br><br><br><br><br>
+            <p align="center">No items available in the cart right now.</p>
+            <br><br><br><br><br>
+        {% endif %}
+        <br><br>
+
+        <!-- Razorpay Payment Script -->
+        {% if razorpay_payment %}
+        <form method="POST" action="{% url 'payment_status' %}">
+            {% csrf_token %}
+            <script
+                src="https://checkout.razorpay.com/v1/checkout.js"
+                data-key="rzp_test_VQhEfe2NCXbbwI"
+                data-amount="{{ razorpay_payment.amount }}"
+                data-currency="INR"
+                data-order_id="{{ razorpay_payment.order_id }}"
+                data-buttontext="Pay with Razorpay"
+                data-name="Arc"
+                data-description="A Wild Sheep Chase is the third novel by Japanese author Haruki Murakami"
+                data-image="https://example.com/your_logo.jpg"
+                data-prefill.name="{{ razorpay_payment.name }}"
+                data-prefill.email="gaurav.kumar@example.com"
+                data-theme.color="#F37254"
+            ></script>
+            <input type="hidden" custom="Hidden Element" name="hidden" />
+        </form>
+        {% endif %}
+
+{% endblock %}
+
+{% block js %}
+
+        <script>
+            document.getElementById('payment_mode').addEventListener('change', function () {
+                const offlineFields = document.getElementById('offline-fields');
+                if (this.value === 'offline') {
+                    offlineFields.style.display = 'block';
+                } else {
+                    offlineFields.style.display = 'none';
+                }
+            });
+        </script>
+        <script>
+            $(document).ready(function () {
+                // Handle click event on the anchor tag
+                $('.openModalButton').click(function (e) {
+                    e.preventDefault(); // Prevent the default behavior of the anchor tag
+                    var modalId = $(this).attr('href'); // Get the href attribute which contains the modal's ID
+                    $(modalId).modal('show'); // Trigger the modal to show
+                });
+            });
+        </script>
+        <script>
+            $(document).ready(function () {
+                // Handle click event on the anchor tag
+                $('.openModalButton').click(function (e) {
+                    e.preventDefault();
+                    var modalId = $(this).attr('href');
+                    $(modalId).modal('show');
+                });
+
+                // Initialize date inputs with today's date as default
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('start_date').value = today;
+            });
+        </script>
+
+        <script>
+        function calculateTotalPrice() {
+            const startDate = document.getElementById("start_date").value;
+            const endDate = document.getElementById("end_date").value;
+            const startError = document.getElementById("pick_date_error");
+            const endError = document.getElementById("return_date_error");
+            const today = new Date().toISOString().split('T')[0];
+
+            // Reset errors
+            startError.style.display = 'none';
+            endError.style.display = 'none';
+
+            if (!startDate || !endDate) return;
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const totalDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+
+            // Validation
+            if (startDate < today) {
+                startError.style.display = 'block';
+                return;
+            }
+            if (totalDays < 0) {
+                endError.style.display = 'block';
+                return;
+            }
+            if (totalDays < 1) {
+                alert("Rental period must be at least 1 day.");
+                return;
+            }
+
+            // Calculate total price
+            const cartitems = JSON.parse('{{ cartitems_json|safe }}');
+            let totalPrice = 0;
+
+            cartitems.forEach(item => {
+                totalPrice += (item.Pro_price * item.Quantity) * totalDays;
+            });
+
+            totalPrice += {{total_deposite}}
+            document.getElementById("total_price").value = totalPrice.toFixed(2);
+        }
+
+        // Attach event listeners
+        document.getElementById("start_date").addEventListener("change", calculateTotalPrice);
+        document.getElementById("end_date").addEventListener("change", calculateTotalPrice);
+
+        // Initial calculation on page load
+        window.addEventListener('load', function() {
+            if (document.getElementById("start_date").value && document.getElementById("end_date").value) {
+                calculateTotalPrice();
+            }
+        });
+        </script>
+{% endblock %}

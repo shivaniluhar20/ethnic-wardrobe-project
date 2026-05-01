@@ -1,0 +1,106 @@
+{% extends 'basic.html' %}
+{% load static %}
+
+{% block title %}Login / Register - Ashion {% endblock %}
+{% block body %}
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <span>Login / Register</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Contact Section Begin -->
+    <section class="contact spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 border border-info p-5 rounded">
+                    <div class="contact__content">
+                        <br><br><br><br><br><br><br><br>
+                        <div class="contact__address">
+                            <h5>Sign in</h5>
+
+                        </div>
+                        <div class="contact__form">
+                            <form method="post" action="/checkuser">
+                                {% csrf_token %}
+                                <input type="email" placeholder="Email" name="email" required>
+                                <input type="password" placeholder="Password" name="password" required>
+                                <button type="submit" class="site-btn">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="contact__content">
+
+
+                        <img src="static/img/poster7.jpg">
+
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block js %}
+<script>
+    function validateForm() {
+        // Validate password
+        if (!validatePassword()) {
+            return false;
+        }
+
+        // Validate age
+        var dob = document.getElementById('dob').value;
+        var today = new Date();
+        var birthDate = new Date(dob);
+        var age = today.getFullYear() - birthDate.getFullYear();
+        var monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        if (age < 15) {
+            alert("You must be at least 15 years old to register.");
+            return false;
+        }
+
+        // Continue with form submission if all validations pass
+        return true;
+    }
+
+    function validatePassword() {
+        // Your existing password validation logic
+        var password = document.getElementById("password").value;
+        var repeatPassword = document.getElementById("repeat-password").value;
+
+        // Check if passwords match
+        if (password !== repeatPassword) {
+            alert("Passwords do not match");
+            return false;
+        }
+
+        // Check if password meets the criteria
+        var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            alert("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one special character, and one number.");
+            return false;
+        }
+
+        // Password is valid
+        return true;
+    }
+</script>
+{% endblock %}

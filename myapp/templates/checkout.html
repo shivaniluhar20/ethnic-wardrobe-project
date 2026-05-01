@@ -1,0 +1,145 @@
+{% extends 'basic.html' %}
+{% load static %}
+
+{% block title %}Checkout {% endblock %}
+{% block body %}
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <span>Checkout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Checkout Section Begin -->
+    <section class="checkout spad">
+        <div class="container">
+            <form action="/placeorder" method="post" id="checkoutForm" class="checkout__form" enctype="multipart/form-data">
+                                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h5>Billing detail</h5>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="checkout__form__input">
+                                    <p>Name <span>*</span></p>
+                                    <input type="text" name="oname" id="oname" value="{{userdata.Name}}" required>
+                                    <input type="hidden" name="grandtotal" value="{{carttotal}}">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="checkout__form__input">
+                                    <p>Phone <span>*</span></p>
+                                    <input type="text" name="ophone" id="ophone"value="{{userdata.Phone}}" pattern="[6789][0-9]{9}" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="checkout__form__input">
+                                    <p>Shipping Address <span>*</span></p>
+                                    <input type="text" name="oaddress" value="{{userdata.Address}}" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="">
+                                    <p>Payment Option <span>*</span></p>
+                                    <input type="radio" value="Cash" name="paymentopt" id="cashOption" checked> Cash
+                                    <input type="radio" value="Card" name="paymentopt" id="cardOption"> Card
+                                </div>
+                                <div id="cardDetails" style="display: none;">
+                                    <div class="checkout__form__input">
+                                        <p>Card Number <span>*</span></p>
+                                        <input type="text" name="cardNumber" id="cardNumber">
+                                    </div>
+                                    <div class="checkout__form__input">
+                                        <p>Expiration Date <span>*</span></p>
+                                        <input type="text" name="expDate" id="expDate">
+                                    </div>
+                                    <div class="checkout__form__input">
+                                        <p>CVV <span>*</span></p>
+                                        <input type="text" name="cvv" id="cvv">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="checkout__order">
+                            <h5>Your order</h5>
+                            <div class="checkout__order__product">
+                                <ul>
+                                    <li>
+                                        <span class="top__text">Product</span>
+                                        <span class="top__text__right">Total</span>
+                                    </li>
+                                    {% for cd in cartitems %}
+                                    <li>{{forloop.counter}}. {{cd.Product_name}} <span>₹ {{cd.Final_price}}</span></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="checkout__order__total">
+                                <ul>
+                                    <li>Subtotal <span>₹ {{carttotal}}</span></li>
+                                    <li>Total <span>₹ {{carttotal}}</span></li>
+                                </ul>
+                            </div>
+                            <button type="submit" class="site-btn">Place order</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+    <!-- Checkout Section End -->
+
+   <script>
+    document.getElementById("cardOption").addEventListener("change", function () {
+        var cardDetails = document.getElementById("cardDetails");
+        if (this.checked) {
+            cardDetails.style.display = "block";
+        } else {
+            cardDetails.style.display = "none";
+        }
+    });
+
+    document.getElementById("cashOption").addEventListener("change", function () {
+        var cardDetails = document.getElementById("cardDetails");
+        if (!document.getElementById("cardOption").checked) {
+            cardDetails.style.display = "none";
+        }
+    });
+
+    document.getElementById("checkoutForm").addEventListener("submit", function (event) {
+        var paymentOption = document.querySelector('input[name="paymentopt"]:checked').value;
+        if (paymentOption === "Card") {
+            var cardNumber = document.getElementById("cardNumber").value;
+            var expDate = document.getElementById("expDate").value;
+            var cvv = document.getElementById("cvv").value;
+            if (!cardNumber || !expDate || !cvv) {
+                alert("Please fill in all card details");
+                event.preventDefault();
+            } else {
+                // Here you can check if the card details match any predefined dummy card details
+                var dummyCardNumber = "1234567890123456";
+                var dummyExpDate = "12/25";
+                var dummyCVV = "123";
+                if (cardNumber === dummyCardNumber && expDate === dummyExpDate && cvv === dummyCVV) {
+                    alert("Payment accepted");
+                } else {
+                    alert("Payment details invalid");
+                    event.preventDefault();
+                }
+            }
+        }
+    });
+</script>
+
+
+{% endblock %}

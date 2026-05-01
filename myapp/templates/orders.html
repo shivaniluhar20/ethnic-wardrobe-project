@@ -1,0 +1,91 @@
+{% extends 'basic.html' %}
+{% load static %}
+
+{% block title %}Orders {% endblock %}
+{% block body %}
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <span>Orders</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <section class="shop-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="shop__cart__table">
+                        <table>
+                            <thead>
+                                <tr>
+                                     <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Payment</th>
+                                    <th>Total</th>
+                                    <th class="pr-4">Details</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for od in orderdata %}
+                                <tr>
+                                    <td class="cart__quantity pl-4">
+                                            {{od.id}}
+                                    </td>
+                                    <td class="cart__quantity pr-4">
+                                            {{od.timestamp}}
+                                    </td>
+                                    <td class="cart__quantity ">
+                                            {{od.user.Name}}
+                                    </td>
+                                    <td class="cart__quantity ">
+                                            {{od.user.Phone}}
+                                    </td>
+                                    <td class="cart__quantity ">
+                                            {{od.start_date}}
+                                    </td>
+                                    <td class="cart__quantity ">
+                                            {{od.end_date}}
+                                    </td>
+                                    <td class="cart__quantity ">
+                                            {{od.status}}
+                                    </td>
+                                    <td class="cart__price">₹ {{od.amount}}</td>
+
+                                    <td class=""><a href="/singleorder/{{od.id}}">Order Details</a></td>
+                                    <td class="">
+                                        {% if od.status == 'Cancelled' %}
+                                            Cancelled
+                                        {% else %}
+                                        <a href="/cancelorder/{{od.id}}">Cancel Order</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'basic.html' %}
+{% load static %}
+
+{% block title %}Product Details {% endblock %}
+{% block body %}
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <span>Product Details</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+               <div class="col-lg-6">
+                <div class="product__details__pic">
+                    <div class="product__details__slider__content">
+                        <div class="product__details__pic__slider owl-carousel">
+                            <img data-hash="product-1" class="product__big__img" src="/media/{{proddata.Pro_image}}" alt="">
+
+                            {% for image in images %}
+                                <img class="product__big__img" src="{{ image.Pro_image.url }}" alt="Product Image">
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="col-lg-6">
+                    <div class="product__details__text">
+                        <h3>{{proddata.Pro_name}} <span>Brand: {{proddata.Pro_brandname}}</span></h3>
+                        <p>{{proddata.Pro_subcat}}</p>
+                        <div class="product__details__price">₹ {{proddata.Pro_price}} <span>₹ {{proddata.Pro_price|add:50}}</span></div>
+                        <p>Price Per Day</p>
+                        <p>{{proddata.Pro_description}}</p>
+                        <form action="/addtocart" method="post" enctype="multipart/form-data" >
+												{% csrf_token %}
+                            <input type="hidden" name="pid" value="{{proddata.id}}">
+                        {% if request.session.log_user %}
+                            {% if not profiledata.is_seller %}
+                            <div class="product__details__button">
+                                <div class="quantity">
+                                    <span>Quantity:</span>
+                                    <div class="pro-qty">
+                                        <input type="text" name="quantity" value="1">
+                                    </div>
+                                </div>
+                                <button type="submit" style="border: 1px solid #c91615;" class="cart-btn"><span class="icon_bag_alt"></span> Add to cart</button>
+
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                        </form>
+                        <div class="product__details__widget">
+                            <ul>
+
+
+                                <li>
+                                    <span>Available size:</span>
+                                    <div class="size__btn">
+                                        <label for="xs-btn" class="active">
+                                            <input type="radio" id="xs-btn">
+                                            xs
+                                        </label>
+                                        <label for="s-btn">
+                                            <input type="radio" id="s-btn">
+                                            s
+                                        </label>
+                                        <label for="m-btn">
+                                            <input type="radio" id="m-btn">
+                                            m
+                                        </label>
+                                        <label for="l-btn">
+                                            <input type="radio" id="l-btn">
+                                            l
+                                        </label>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span>Promotions:</span>
+                                    <p>Free shipping</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        // Handle click event on the anchor tag
+        $('.openModalButton').click(function (e) {
+            e.preventDefault(); // Prevent the default behavior of the anchor tag
+            var modalId = $(this).attr('href'); // Get the href attribute which contains the modal's ID
+            $(modalId).modal('show'); // Trigger the modal to show
+        });
+    });
+</script>
+
+
+
+{% endblock %}

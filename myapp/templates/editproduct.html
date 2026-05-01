@@ -1,0 +1,113 @@
+{% extends 'basic.html' %}
+{% load static %}
+
+{% block title %}Edit Product {% endblock %}
+{% block body %}
+
+    <!-- Breadcrumb Begin -->
+    <div class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__links">
+                        <a href="/"><i class="fa fa-home"></i> Home</a>
+                        <span>Edit Product</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Contact Section Begin -->
+    <section class="contact spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-2 col-md-2"></div>
+                <div class="col-lg-9 col-md-9">
+                    <div class="row">
+                        <div class="contact__form" style="margin:20px;">
+                                                <h5>Edit Product Details</h5>
+                                                <form action="/editproductdetails" method="post" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <!-- Your form inputs go here -->
+                                                    <label>Product Name</label>
+                                                    <input name="pname" value="{{proddata.Pro_name}}" type="text" required>
+                                                    <input name="pid" value="{{proddata.id}}" type="hidden" required>
+                                                    <label>Product Price</label>
+                                                    <input name="price" value="{{proddata.Pro_price}}" type="text" required>
+                                                    <label>Product Description</label>
+                                                    <input name="pdesc" value="{{proddata.Pro_description}}" type="text" required>
+                                                    <img src="/media/{{proddata.Pro_image}}" height="150px"><br>
+                                                    <label>Product Image</label>
+                                                    <input type="file" name="pimage" accept="image/*" style="padding:10px; margin-top:5px;">
+                                                    <label for="pcat">Category:</label><br>
+                                                    <select name="pcat" id="pcat" style="padding:10px; width:100%; border: 1px solid #e1e1e1; border-radius: 10px; margin-bottom:15px;" required>
+                                                        <option value="{{proddata.Pro_Cat.id}}" selected>{{proddata.Pro_Cat}}</option>
+                                                        {% for cat in catdata %}
+                                                         <option value="{{cat.id}}">{{cat.Product_category_name}}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <label for="psubcat">Sub Category:</label><br>
+                                                    <select name="psubcat" id="psubcat" style="padding:10px; width:100%; border: 1px solid #e1e1e1; border-radius: 10px; margin-bottom:15px;" required>
+                                                        <option value="{{proddata.Pro_subcat.id}}" selected>{{proddata.Pro_subcat}}</option>
+                                                    </select>
+                                                    <div class="sign-up">
+                                                        <input type="submit" value="Submit">
+                                                    </div>
+                                                </form>
+                                            </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+        // Handle click event on the anchor tag
+        $('.openModalButton').click(function (e) {
+            e.preventDefault(); // Prevent the default behavior of the anchor tag
+            var modalId = $(this).attr('href'); // Get the href attribute which contains the modal's ID
+            $(modalId).modal('show'); // Trigger the modal to show
+        });
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#pcat').change(function () {
+            var cat_id = $(this).val();
+            if (cat_id) {
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'get_subcategories' %}?cat_id=" + cat_id,
+                    success: function (data) {
+                        // Clear the subcategory dropdown
+                        $('#psubcat').empty();
+                        // Add the default option
+                        $('#psubcat').append('<option value="">Select Subcategory</option>');
+                        // Add the filtered subcategories
+                        $.each(data, function(index, subcategory) {
+                            $('#psubcat').append('<option value="' + subcategory.id + '">' + subcategory.name + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX request error:", error); // Log AJAX request error
+                    }
+                });
+            } else {
+                // If no category is selected, reset the subcategory dropdown
+                $('#psubcat').empty();
+                $('#psubcat').append('<option value="">Select Subcategory</option>');
+            }
+        });
+    });
+</script>
+
+
+
+{% endblock %}
